@@ -275,11 +275,14 @@ installJqueryAjaxSuccessPageUpdateTrigger = ->
       triggerEvent 'page:update'
 
 installHistoryChangeHandler = (event) ->
-  if event.state?.turbolinks
-    if cachedPage = pageCache[event.state.position]
-      fetchHistory cachedPage
-    else
-      visit event.target.location.href
+  unless pageChangePrevented()
+    if event.state?.turbolinks
+      if cachedPage = pageCache[event.state.position]
+        fetchHistory cachedPage
+      else
+        visit event.target.location.href
+  else
+    window.history.pushState { turbolinks: true, position: currentState.position + 1 }, '', referrer
 
 initializeTurbolinks = ->
   rememberCurrentUrl()
