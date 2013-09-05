@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Home</title>
+  <script type="text/javascript" src="/js/turbolinks.js?2" data-turbolinks-track='true'></script>
+  <script type="text/javascript">
+    document.addEventListener("page:before-change", function(){
+      if (!confirm('Continue?')) {
+        event.preventDefault();
+      }
+    });
+  </script>
+</head>
+<body class="page-back">
+  <ul>
+    <li><a href="/third.html">Third</a></li>
+    Try to play with forward button. <br />
+    There will not be confirmation on moving forward. <br />
+    And will be confirmation on backward button. <br />
+  </ul>
+</body>
+</html>

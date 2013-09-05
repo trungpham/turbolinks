@@ -8,6 +8,8 @@ referer        = null
 createDocument = null
 xhr            = null
 
+popped = undefined
+initialURL = undefined
 
 fetchReplacement = (url) ->  
   rememberReferer()
@@ -92,7 +94,7 @@ removeNoscriptTags = ->
 
 reflectNewUrl = (url) ->
   if url isnt referer
-    window.history.pushState { turbolinks: true, position: currentState.position + 1 }, '', url
+    window.history.pushState { turbolinks: true, position: currentState.position + 1, referer: url }, '', url
 
 reflectRedirectedUrl = ->
   if location = xhr.getResponseHeader 'X-XHR-Redirected-To'
@@ -103,7 +105,7 @@ rememberReferer = ->
   referer = document.location.href
 
 rememberCurrentUrl = ->
-  window.history.replaceState { turbolinks: true, position: Date.now() }, '', document.location.href
+  window.history.replaceState { turbolinks: true, position: Date.now(), referer: document.location.href }, '', document.location.href
 
 rememberCurrentState = ->
   currentState = window.history.state
@@ -275,16 +277,27 @@ installJqueryAjaxSuccessPageUpdateTrigger = ->
       triggerEvent 'page:update'
 
 installHistoryChangeHandler = (event) ->
-  unless pageChangePrevented()
-    if event.state?.turbolinks
+
+  initialPop = !popped && location.href == initialURL
+  popped = true
+  return if initialPop
+
+  if event.state?.turbolinks
+    is_forward = event.state.position > currentState.position
+    if is_forward || !pageChangePrevented()
       if cachedPage = pageCache[event.state.position]
         fetchHistory cachedPage
       else
         visit event.target.location.href
-  else
-    window.history.pushState { turbolinks: true, position: currentState.position + 1 }, '', referrer
+    else
+      window.history.pushState { turbolinks: true, position: currentState.position, referer: currentState.referer }, '',  currentState.referer
+
 
 initializeTurbolinks = ->
+
+  popped = ('state' in window.history)
+  initialURL = location.href
+
   rememberCurrentUrl()
   rememberCurrentState()
   createDocument = browserCompatibleDocumentParser()
