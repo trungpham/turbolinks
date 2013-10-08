@@ -43,7 +43,7 @@ fetchReplacement = (url) ->
 fetchHistory = (cachedPage) ->
   cacheCurrentPage()
   xhr?.abort()
-  changePage cachedPage.title, cachedPage.body
+  changePage cachedPage.title, cachedPage.body, null, 'runScripts'
   recallScrollPosition cachedPage
   triggerEvent 'page:restore'
 
